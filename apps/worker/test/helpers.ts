@@ -79,10 +79,18 @@ export async function createTestOperator(admin: Sql): Promise<string> {
   return user.id;
 }
 
-/** Führt fn so aus, wie PostgREST es für einen angemeldeten Nutzer tun würde (Rolle authenticated + JWT-Claims). */
-export async function asUser<T>(admin: Sql, userId: string, fn: (tx: postgres.TransactionSql) => Promise<T>): Promise<T> {
+/**
+ * Führt fn so aus, wie PostgREST es für einen angemeldeten Nutzer tun würde (Rolle authenticated + JWT-Claims).
+ * Standard: mit MFA (aal2); `aal: "aal1"` simuliert eine Anmeldung nur mit Passwort.
+ */
+export async function asUser<T>(
+  admin: Sql,
+  userId: string,
+  fn: (tx: postgres.TransactionSql) => Promise<T>,
+  aal: "aal1" | "aal2" = "aal2",
+): Promise<T> {
   return (await admin.begin(async (tx) => {
-    await tx`select set_config('request.jwt.claims', ${JSON.stringify({ sub: userId, role: "authenticated" })}, true)`;
+    await tx`select set_config('request.jwt.claims', ${JSON.stringify({ sub: userId, role: "authenticated", aal })}, true)`;
     await tx.unsafe("set local role authenticated");
     return fn(tx);
   })) as T;

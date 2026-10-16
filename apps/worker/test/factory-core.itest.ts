@@ -95,6 +95,24 @@ describe("Menschliche Freigaben", () => {
     );
   });
 
+  it("Operatoren brauchen MFA (aal2) für Entscheidungen und zum Lesen", async () => {
+    const queue = await registeredQueue("mfa");
+    const approvalId = await queue.requestApproval({ actionType: "test.x", level: "B", summary: "x", payload: {} });
+    await expectDenied(
+      asUser(admin, operatorId, (tx) => tx`select fabric.decide_approval(${approvalId}, true, 'ohne MFA')`, "aal1"),
+      /MFA/,
+    );
+    const visibleAal1 = await asUser(admin, operatorId, (tx) => tx`select count(*)::int as n from fabric.approvals where id = ${approvalId}`, "aal1");
+    const visibleAal2 = await asUser(admin, operatorId, (tx) => tx`select count(*)::int as n from fabric.approvals where id = ${approvalId}`);
+    expect(visibleAal1[0]?.n).toBe(0);
+    expect(visibleAal2[0]?.n).toBe(1);
+    const [who] = await asUser(admin, operatorId, (tx) => tx`select fabric.whoami() as w`, "aal1");
+    expect(who?.w).toMatchObject({ user_id: operatorId, aal: "aal1", registered_operator: true });
+    await expectDenied(asUser(admin, operatorId, (tx) => tx`select fabric.dashboard_overview()`, "aal1"), /MFA/);
+    const [overview] = await asUser(admin, operatorId, (tx) => tx`select fabric.dashboard_overview() as o`);
+    expect(overview?.o).toHaveProperty("kill_switch", false);
+  });
+
   it("Stufe C braucht eine ausdrückliche Begründung", async () => {
     const queue = await registeredQueue("levelc");
     const approvalId = await queue.requestApproval({ actionType: "test.buy", level: "C", summary: "x", payload: {} });

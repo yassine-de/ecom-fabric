@@ -32,3 +32,14 @@ Entscheidung: eigene Postgres-Queue statt pg-boss – siehe [ADR 0001](adr/0001-
 | Integrationstests in GitHub-CI | Geplant (braucht separates Test-Projekt + Secrets) |
 
 Startbudgets (Annahme, änderbar nur durch Operatoren): LLM 3 €/Tag · 50 €/Monat, Medien 5 €/Tag · 50 €/Monat, Recherche 25 €/Monat, gesamt 100 €/Monat.
+
+## M1b – Dashboard-Login und Freigaben (16.10.2026)
+
+| Baustein | Status |
+|---|---|
+| Migration: MFA-Pflicht (aal2) für alle Operator-Rechte inkl. Lesen; `whoami`, `dashboard_overview` | Integration getestet (23 Tests) |
+| Supabase-Auth im Dashboard (Proxy, Session-Cookies, Data-Access-Layer) | Lokal getestet (Weiterleitung zum Login) |
+| Login, Registrierung (Passwort ≥ 12 Zeichen), TOTP-Einrichtung und -Abfrage | Implementiert |
+| Freigaben-Seite (Stufe B/C, Payload, Begründungspflicht C), Übersicht mit Kill-Switch und Budgets, Audit-Log | Implementiert |
+| Operator-Freischaltung `npm run db:add-operator -- --email …` | Lokal getestet (Fehlerfall) |
+| End-to-End im Browser (Login → MFA → Freigabe) | Offen – braucht Schema `fabric` in Supabase „Exposed schemas“ |

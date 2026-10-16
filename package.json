@@ -23,7 +23,8 @@
     "db:migrate": "tsx --env-file-if-exists=.env.local scripts/db-migrate.ts",
     "db:setup-worker": "tsx --env-file-if-exists=.env.local scripts/db-setup-worker-role.ts",
     "fabric": "tsx --env-file-if-exists=.env.local scripts/fabric.ts",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "db:add-operator": "tsx --env-file-if-exists=.env.local scripts/db-add-operator.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

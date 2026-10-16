@@ -1,11 +1,19 @@
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { loadEnvConfig } from "@next/env";
+import { parseEnv } from "node:util";
 import type { NextConfig } from "next";
 
-// Eine gemeinsame .env.local im Projektstamm für Dashboard und Worker.
-loadEnvConfig(resolve(process.cwd(), "..", ".."));
+// Gemeinsame .env.local im Projektstamm (auch vom Worker genutzt). Das Dashboard übernimmt daraus
+// bewusst NUR die zwei öffentlichen Werte – Secret Key und DB-URLs erreichen diesen Prozess nie.
+const rootEnvFile = resolve(process.cwd(), "..", "..", ".env.local");
+const rootEnv = existsSync(rootEnvFile) ? parseEnv(readFileSync(rootEnvFile, "utf8")) : {};
+const pick = (key: string) => process.env[key] ?? rootEnv[key] ?? "";
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: pick("NEXT_PUBLIC_SUPABASE_URL"),
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: pick("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
+  },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
