@@ -31,7 +31,7 @@ const publishableKey = z
   });
 
 const secretKey = z.string().refine(isPrivilegedSupabaseKey, {
-  message: "Secret Key muss mit sb_secret_ beginnen",
+  message: "Secret Key muss mit sb_secret_ beginnen (oder ein service_role-JWT sein)",
 });
 
 export const fabricEnvSchema = z.object({
@@ -42,9 +42,14 @@ export const fabricEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: optional(publishableKey),
   SUPABASE_SECRET_KEY: optional(secretKey),
   SUPABASE_DB_URL: optional(
-    z.string().refine((v) => /^postgres(ql)?:\/\//.test(v), {
-      message: "SUPABASE_DB_URL muss mit postgresql:// beginnen",
-    }),
+    z
+      .string()
+      .refine((v) => /^postgres(ql)?:\/\//.test(v), {
+        message: "SUPABASE_DB_URL muss mit postgresql:// beginnen",
+      })
+      .refine((v) => !v.includes("[YOUR-PASSWORD]"), {
+        message: "SUPABASE_DB_URL enthält noch den Platzhalter [YOUR-PASSWORD]",
+      }),
   ),
 });
 

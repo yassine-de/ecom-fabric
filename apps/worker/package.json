@@ -8,6 +8,7 @@
     "start": "tsx --env-file-if-exists=../../.env.local src/index.ts"
   },
   "dependencies": {
-    "@ecom-fabric/core": "*"
+    "@ecom-fabric/core": "*",
+    "postgres": "^3.4.9"
   }
 }

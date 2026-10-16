@@ -43,6 +43,9 @@ describe("parseFabricEnv", () => {
   it("verlangt https und eine Postgres-URL", () => {
     expect(() => parseFabricEnv({ NEXT_PUBLIC_SUPABASE_URL: "http://x.supabase.co" })).toThrow(/https/);
     expect(() => parseFabricEnv({ ...base, SUPABASE_DB_URL: "mysql://x" })).toThrow(/postgresql/);
+    expect(() =>
+      parseFabricEnv({ ...base, SUPABASE_DB_URL: "postgresql://u:[YOUR-PASSWORD]@h:5432/postgres" }),
+    ).toThrow(/Platzhalter/);
   });
 
   it("lehnt unbekannte Umgebungen ab", () => {
