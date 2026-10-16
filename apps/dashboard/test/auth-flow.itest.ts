@@ -20,6 +20,20 @@ const DASHBOARD = "http://localhost:3000";
 let admin: Sql;
 let userId: string;
 let user: SupabaseClient;
+let factorId: string;
+let totpSecret: string;
+
+/** Cookie-Speicher wie im Dashboard (@supabase/ssr-Server-Client), um Server-Action-Abläufe nachzustellen. */
+function ssrClientWithJar() {
+  const jar = new Map<string, string>();
+  const client = createServerClient(URL, PUBLISHABLE, {
+    cookies: {
+      getAll: () => [...jar].map(([name, value]) => ({ name, value })),
+      setAll: (cookies) => cookies.forEach(({ name, value }) => (value ? jar.set(name, value) : jar.delete(name))),
+    },
+  });
+  return { client, cookieHeader: () => [...jar].map(([k, v]) => `${k}=${v}`).join("; ") };
+}
 
 const adminHeaders = () => {
   const key = env.SUPABASE_SECRET_KEY!;
@@ -78,7 +92,9 @@ describe("Supabase-Strecke: Login → MFA → Operator → Freigabe", () => {
   it("TOTP einrichten und bestätigen hebt die Session auf aal2", async () => {
     const enroll = await user.auth.mfa.enroll({ factorType: "totp", friendlyName: `e2e-${runId}` });
     expect(enroll.error).toBeNull();
-    const verify = await user.auth.mfa.challengeAndVerify({ factorId: enroll.data!.id, code: totp(enroll.data!.totp.secret) });
+    factorId = enroll.data!.id;
+    totpSecret = enroll.data!.totp.secret;
+    const verify = await user.auth.mfa.challengeAndVerify({ factorId, code: totp(totpSecret) });
     expect(verify.error).toBeNull();
     const aal = await user.auth.mfa.getAuthenticatorAssuranceLevel();
     expect(aal.data?.currentLevel).toBe("aal2");
@@ -130,15 +146,9 @@ describe("Supabase-Strecke: Login → MFA → Operator → Freigabe", () => {
 
     // Session-Cookies so erzeugen, wie das Dashboard sie selbst schreibt (@supabase/ssr).
     const { data } = await user.auth.getSession();
-    const jar = new Map<string, string>();
-    const ssr = createServerClient(URL, PUBLISHABLE, {
-      cookies: {
-        getAll: () => [...jar].map(([name, value]) => ({ name, value })),
-        setAll: (cookies) => cookies.forEach(({ name, value }) => (value ? jar.set(name, value) : jar.delete(name))),
-      },
-    });
-    await ssr.auth.setSession({ access_token: data.session!.access_token, refresh_token: data.session!.refresh_token });
-    const cookie = [...jar].map(([k, v]) => `${k}=${v}`).join("; ");
+    const ssr = ssrClientWithJar();
+    await ssr.client.auth.setSession({ access_token: data.session!.access_token, refresh_token: data.session!.refresh_token });
+    const cookie = ssr.cookieHeader();
 
     const page = async (path: string) => {
       const res = await fetch(`${DASHBOARD}${path}`, { headers: { cookie }, redirect: "manual" });
@@ -161,4 +171,25 @@ describe("Supabase-Strecke: Login → MFA → Operator → Freigabe", () => {
     const anon = await fetch(`${DASHBOARD}/freigaben`, { redirect: "manual" });
     expect(anon.status).toBe(307);
   });
+
+  it.skipIf(!dashboardRunning)(
+    "Anmeldung wie in den Server Actions: Passwort → TOTP-Code → Cookies tragen eine aal2-Session",
+    async () => {
+      const { client, cookieHeader } = ssrClientWithJar();
+      const signIn = await client.auth.signInWithPassword({ email, password });
+      expect(signIn.error).toBeNull();
+      const afterPassword = await fetch(`${DASHBOARD}/`, { headers: { cookie: cookieHeader() }, redirect: "manual" });
+      expect(await afterPassword.text()).not.toContain("Offene Freigaben"); // ohne MFA keine Live-Daten
+
+      // TOTP-Codes sind pro 30-s-Fenster nur einmal gültig – ggf. auf das nächste Fenster warten.
+      await new Promise((r) => setTimeout(r, 30_000 - (Date.now() % 30_000) + 500));
+      const verify = await client.auth.mfa.challengeAndVerify({ factorId, code: totp(totpSecret) });
+      expect(verify.error).toBeNull();
+
+      const afterMfa = await fetch(`${DASHBOARD}/`, { headers: { cookie: cookieHeader() }, redirect: "manual" });
+      expect(afterMfa.status).toBe(200);
+      expect(await afterMfa.text()).toContain("Offene Freigaben");
+    },
+    90_000,
+  );
 });
