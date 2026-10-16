@@ -1,6 +1,7 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { supabasePublicConfig } from "./config";
 
 /**
@@ -8,6 +9,8 @@ import { supabasePublicConfig } from "./config";
  * Publishable Key + Nutzer-Session aus Cookies – Rechte setzt die Datenbank (RLS, MFA, Operator).
  */
 export async function createSupabaseServerClient() {
+  // Session-Prüfung nutzt die aktuelle Uhrzeit (Token-Ablauf) – daher nie vorab rendern.
+  await connection();
   const cookieStore = await cookies();
   const { url, publishableKey } = supabasePublicConfig();
   return createServerClient(url, publishableKey, {
