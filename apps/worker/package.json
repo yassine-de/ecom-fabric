@@ -1,0 +1,13 @@
+{
+  "name": "@ecom-fabric/worker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@ecom-fabric/core": "*"
+  }
+}

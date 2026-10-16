@@ -1,0 +1,49 @@
+{
+  "product": {
+    "id": "spingrip",
+    "name": "SpinGrip – Magnetischer Handy-Ring mit Fidget-Spinner",
+    "currency": "EUR",
+    "notes": [
+      "Verkaufspreise: Fakt aus dem Shopify-Shop (abgerufen 16.10.2026).",
+      "Alle Kosten sind Schätzungen oder Annahmen, bis reale Lieferanten- und Versandangebote vorliegen.",
+      "Annahme Liefermodell: Testmenge aus DE im Eigenversand (eigene Arbeitszeit nicht bewertet)."
+    ]
+  },
+  "defaults": {
+    "vatRate": { "value": 0.19, "kind": "fact", "source": "USt-Regelsatz DE" },
+    "discountGross": { "value": 0, "kind": "fact", "source": "kein Rabatt im Shop" },
+    "shippingChargedGross": { "value": 0, "kind": "assumption", "note": "kostenloser Versand – Versandeinstellungen in Shopify prüfen" },
+    "unitCost": { "value": 2.5, "kind": "estimate", "note": "typischer Großhandelspreis, Lieferantenangebot einholen" },
+    "inboundCostPerUnit": { "value": 0.8, "kind": "estimate", "note": "Luftfracht + Zoll/EUSt-neutral für Testmenge ~100 Stk." },
+    "outboundShipping": { "value": 4.5, "kind": "estimate", "note": "versichertes Paket/Päckchen DE, günstigere Tarife prüfen" },
+    "packaging": { "value": 0.4, "kind": "estimate", "note": "Versandtasche + Beilage" },
+    "fulfillmentHandling": { "value": 0, "kind": "assumption", "note": "Eigenversand, Arbeitszeit nicht bewertet" },
+    "paymentFeePercent": { "value": 0.019, "kind": "assumption", "note": "Shopify-Payments-Satz im Admin prüfen" },
+    "paymentFeeFixed": { "value": 0.25, "kind": "assumption", "note": "Shopify-Payments-Satz im Admin prüfen" },
+    "returnRate": { "value": 0.08, "kind": "assumption", "note": "Impulsartikel, keine Größen-Retouren" },
+    "returnShippingCost": { "value": 0, "kind": "assumption", "note": "Kunde trägt Rücksendekosten (muss in Widerrufsbelehrung stehen)" },
+    "returnHandlingCost": { "value": 1, "kind": "assumption", "note": "Prüfen, Umpacken, Erstattung" },
+    "returnResaleRate": { "value": 0.5, "kind": "assumption" },
+    "otherVariableCosts": { "value": 0, "kind": "assumption", "note": "keine weiteren bekannt" }
+  },
+  "offers": [
+    {
+      "id": "spingrip-1",
+      "name": "1 Stück",
+      "units": 1,
+      "grossPrice": { "value": 19.9, "kind": "fact", "source": "Shopify, Variante RING-1-*" }
+    },
+    {
+      "id": "spingrip-2",
+      "name": "2er-Set",
+      "units": 2,
+      "grossPrice": { "value": 29.9, "kind": "fact", "source": "Shopify, Variante RING-2-*" }
+    },
+    {
+      "id": "spingrip-3",
+      "name": "3er-Set",
+      "units": 3,
+      "grossPrice": { "value": 39.9, "kind": "fact", "source": "Shopify, Variante RING-3-*" }
+    }
+  ]
+}
