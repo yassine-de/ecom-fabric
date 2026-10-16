@@ -1,7 +1,11 @@
+import { resolve } from "node:path";
+import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
 
+// Eine gemeinsame .env.local im Projektstamm für Dashboard und Worker.
+loadEnvConfig(resolve(process.cwd(), "..", ".."));
+
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
