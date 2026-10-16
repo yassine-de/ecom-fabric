@@ -9,7 +9,8 @@
 | CLI-Bericht `npm run ue` + SpinGrip-Auswertung | Lokal getestet |
 | Dashboard-Skelett (Next.js 16, Übersicht + Unit Economics, mobil geprüft) | Lokal getestet |
 | Worker-Skelett mit eindeutiger Worker-ID | Lokal getestet (2 Tests) |
-| GitHub-Actions-CI | Implementiert (läuft erst nach Push zu GitHub) |
-| Supabase dev-Projekt, Migrationen | Geplant (benötigt Konto des Nutzers) |
+| GitHub-Repo `yassine-de/ecom-fabric` + Actions-CI | Integration getestet (Push erfolgreich) |
+| Supabase-Konfiguration (`.env.local`, Schlüssel-Schutz, `npm run check:supabase`) | Lokal getestet – Publishable Key wird vom Nutzer eingetragen |
+| Supabase-Migrationen | Geplant (M1, benötigt Secret Key + DB-Verbindung) |
 
 **SpinGrip-Ergebnis (Kosten größtenteils geschätzt):** max. CPA 6,61 € (1 Stk.) / 10,98 € (2er) / 15,35 € (3er), Break-even-ROAS 3,01 / 2,72 / 2,60 → Gate nicht bestanden. Bericht: `reports/unit-economics/spingrip.md`.
