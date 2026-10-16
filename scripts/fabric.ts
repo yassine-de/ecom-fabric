@@ -3,6 +3,7 @@
  *
  *   npm run fabric -- status
  *   npm run fabric -- enqueue <agent> <typ> [--payload-file datei.json | --payload '{...}'] [--key idempotenz-key]
+ *       [--approval B|C --summary "Text"]   # Job wartet auf Freigabe im Dashboard
  *
  * Beispiel:
  *   npm run fabric -- enqueue unit-economics unit-economics.analyze --payload-file data/products/spingrip.json
@@ -55,10 +56,20 @@ try {
     const file = flag("--payload-file");
     const inline = flag("--payload");
     const payload = (file ? JSON.parse(readFileSync(file, "utf8")) : inline ? JSON.parse(inline) : {}) as Json;
-    const job = await queue.enqueue({ agentId, type, payload, idempotencyKey: flag("--key") });
-    console.log(`✓ Job ${job.id} (${job.type}) – Status ${job.status}`);
+    const level = flag("--approval");
+    if (level !== undefined && level !== "B" && level !== "C") throw new Error("--approval muss B oder C sein");
+    const job = await queue.enqueue({
+      agentId,
+      type,
+      payload,
+      idempotencyKey: flag("--key"),
+      approval: level ? { level, summary: flag("--summary") ?? type } : undefined,
+    });
+    console.log(`✓ Job ${job.id} (${job.type}) – Status ${job.status}${job.approvalId ? ` · Freigabe ${job.approvalId}` : ""}`);
   } else {
-    console.log("Befehle: status | enqueue <agent> <typ> [--payload-file f.json | --payload '{...}'] [--key k]");
+    console.log(
+      "Befehle: status | enqueue <agent> <typ> [--payload-file f.json | --payload '{...}'] [--key k] [--approval B|C --summary text]",
+    );
     process.exitCode = command ? 1 : 0;
   }
 } catch (err) {

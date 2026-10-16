@@ -6,7 +6,7 @@ if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 export default defineConfig({
   test: {
-    include: ["apps/worker/test/**/*.itest.ts"],
+    include: ["apps/worker/test/**/*.itest.ts", "apps/dashboard/test/**/*.itest.ts"],
     testTimeout: 60_000,
     hookTimeout: 60_000,
     fileParallelism: false,

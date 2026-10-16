@@ -38,8 +38,10 @@ Startbudgets (Annahme, änderbar nur durch Operatoren): LLM 3 €/Tag · 50 €/
 | Baustein | Status |
 |---|---|
 | Migration: MFA-Pflicht (aal2) für alle Operator-Rechte inkl. Lesen; `whoami`, `dashboard_overview` | Integration getestet (23 Tests) |
-| Supabase-Auth im Dashboard (Proxy, Session-Cookies, Data-Access-Layer) | Lokal getestet (Weiterleitung zum Login) |
-| Login, Registrierung (Passwort ≥ 12 Zeichen), TOTP-Einrichtung und -Abfrage | Implementiert |
-| Freigaben-Seite (Stufe B/C, Payload, Begründungspflicht C), Übersicht mit Kill-Switch und Budgets, Audit-Log | Implementiert |
+| Supabase-Auth im Dashboard (Proxy, Session-Cookies, Data-Access-Layer) | Integration getestet (echte Session, Seiten serverseitig gerendert) |
+| Login, Registrierung (Passwort ≥ 12 Zeichen), TOTP-Einrichtung und -Abfrage | Integration getestet über Supabase-API (Login, TOTP, aal2); Klickweg im Browser durch Nutzer offen |
+| Freigaben-Seite (Stufe B/C, Payload, Begründungspflicht C), Übersicht mit Kill-Switch und Budgets, Audit-Log | Integration getestet (Daten-API + Rendering); Formular-Klick durch Nutzer offen |
 | Operator-Freischaltung `npm run db:add-operator -- --email …` | Lokal getestet (Fehlerfall) |
-| End-to-End im Browser (Login → MFA → Freigabe) | Offen – braucht Schema `fabric` in Supabase „Exposed schemas“ |
+| Schema `fabric` in Data API freigegeben; anonymer Zugriff wird abgewiesen | Integration getestet |
+| End-to-End-Test `apps/dashboard/test/auth-flow.itest.ts` (6 Tests, insgesamt 29 Integrationstests) | Integration getestet |
+| Erste echte Freigabe durch den Nutzer im Browser (Demo-Job wartet) | Offen |
