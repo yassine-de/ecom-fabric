@@ -7,3 +7,6 @@
 - Freigabestufen A/B/C (siehe Strategie Abschnitt 11): keine externen Schreibaktionen, Ausgaben oder Veröffentlichungen ohne Freigabe des Nutzers.
 - Secrets nur in `.env.local` (gitignored), nie im Repo oder Chat.
 - Status immer unterscheiden: Geplant · Implementiert · Lokal getestet · Integration getestet · Produktiv.
+- Datenbank: Schema `fabric`, Änderungen nur per neuer Migration in `supabase/migrations` (`npm run db:migrate`). Worker nutzen ausschließlich `FABRIC_WORKER_DB_URL` (Rolle `fabric_worker`); die Admin-URL nur für Migrationen, Einrichtung und Test-Setup.
+- Nach DB-Änderungen `npm run test:integration` (dev-DB) ausführen. Supabase-Pooler: max. 15 Session-Verbindungen.
+- Abweichungen von der Phase-0-Strategie als ADR in `docs/adr` festhalten.

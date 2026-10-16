@@ -51,6 +51,12 @@ export const fabricEnvSchema = z.object({
         message: "SUPABASE_DB_URL enthält noch den Platzhalter [YOUR-PASSWORD]",
       }),
   ),
+  /** Eingeschränkte Rolle fabric_worker – die einzige Verbindung, die Worker benutzen dürfen. */
+  FABRIC_WORKER_DB_URL: optional(
+    z.string().refine((v) => /^postgres(ql)?:\/\/fabric_worker[.:]/.test(v), {
+      message: "FABRIC_WORKER_DB_URL muss die Rolle fabric_worker verwenden",
+    }),
+  ),
 });
 
 export type FabricEnv = z.infer<typeof fabricEnvSchema>;

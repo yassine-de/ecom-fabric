@@ -2,6 +2,7 @@
   "name": "ecom-fabric",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "description": "ECOM-FABRIC GERMANY – teilautonome E-Commerce-Fabrik",
   "workspaces": [
     "packages/*",
@@ -18,7 +19,11 @@
     "dev:dashboard": "npm run dev -w @ecom-fabric/dashboard",
     "dev:worker": "npm run dev -w @ecom-fabric/worker",
     "build": "npm run build -w @ecom-fabric/dashboard",
-    "check:supabase": "tsx --env-file-if-exists=.env.local scripts/check-supabase.ts"
+    "check:supabase": "tsx --env-file-if-exists=.env.local scripts/check-supabase.ts",
+    "db:migrate": "tsx --env-file-if-exists=.env.local scripts/db-migrate.ts",
+    "db:setup-worker": "tsx --env-file-if-exists=.env.local scripts/db-setup-worker-role.ts",
+    "fabric": "tsx --env-file-if-exists=.env.local scripts/fabric.ts",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
