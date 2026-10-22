@@ -8,7 +8,10 @@ export async function ViewerBadge() {
     viewer = await getViewer();
   } catch (err) {
     if (err instanceof SchemaNotExposedError) return <span className="text-bad text-xs">Schema fabric nicht freigegeben</span>;
-    throw err;
+    // Reine Anzeige: darf nie eine Seite oder Server Action blockieren (z. B. Next-16-Dev-Fehler bei
+    // cookies() nach Cookie-Änderung in derselben Anfrage). Rechte prüfen die Seiten selbst.
+    console.warn(`[ViewerBadge] Anmeldestatus nicht lesbar: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
   }
   if (!viewer) return null;
   return (
