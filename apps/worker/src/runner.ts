@@ -68,6 +68,15 @@ export async function runWorker(opts: RunnerOptions, stopSignal: AbortSignal): P
     const handler = handlers[job.type];
     try {
       if (!handler) throw new PermanentJobError(`Kein Handler für Job-Typ ${job.type}`);
+      if (job.approvalId) {
+        // Freigabe direkt vor der Ausführung einlösen: prüft Kill-Switch, Ablauf und Payload-Hash
+        // und markiert sie als ausgeführt. Bei Wiederholungsversuchen desselben Jobs ist sie bereits eingelöst.
+        const consumed = await queue.consumeApproval(job.approvalId, job.payload);
+        const retryOfSameJob = !consumed.ok && consumed.reason === "already_executed" && job.attempts > 1;
+        if (!consumed.ok && !retryOfSameJob) {
+          throw new PermanentJobError(`Freigabe nicht einlösbar: ${consumed.reason}`);
+        }
+      }
       const result = await handler({ job, queue, signal: controller.signal, log });
       if (controller.signal.aborted) throw controller.signal.reason ?? new Error("abgebrochen");
       await queue.complete(job.id, result);

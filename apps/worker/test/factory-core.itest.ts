@@ -371,6 +371,25 @@ describe("Worker-Runner (Ende-zu-Ende)", () => {
     expect(row?.result.offers.map((o) => o.maxCpa)).toEqual([6.61, 10.98, 15.35]);
   });
 
+  it("löst die Freigabe eines Jobs vor der Ausführung selbst ein (genau einmal)", async () => {
+    const type = testType("gated-runner");
+    const queue = await registeredQueue("gated-runner");
+    const job = await queue.enqueue({
+      agentId: "system",
+      type,
+      payload: { x: 1 },
+      approval: { level: "B", summary: "Runner-Test" },
+    });
+    await asUser(admin, operatorId, (tx) => tx`select fabric.decide_approval(${job.approvalId}, true, 'ok')`);
+    const stats = await runWorker(
+      { queue, handlers: { [type]: defaultHandlers["system.echo"]! }, types: [type], once: true },
+      new AbortController().signal,
+    );
+    expect(stats).toMatchObject({ claimed: 1, succeeded: 1 });
+    const [row] = await admin<{ status: string }[]>`select status from fabric.approvals where id = ${job.approvalId}`;
+    expect(row?.status).toBe("executed");
+  });
+
   it("gibt Jobs beim Stoppen eines Workers wieder frei", async () => {
     const type = testType("stop");
     const queue = await registeredQueue("stopper");

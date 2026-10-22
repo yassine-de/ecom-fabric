@@ -39,9 +39,11 @@ Startbudgets (Annahme, änderbar nur durch Operatoren): LLM 3 €/Tag · 50 €/
 |---|---|
 | Migration: MFA-Pflicht (aal2) für alle Operator-Rechte inkl. Lesen; `whoami`, `dashboard_overview` | Integration getestet (23 Tests) |
 | Supabase-Auth im Dashboard (Proxy, Session-Cookies, Data-Access-Layer) | Integration getestet (echte Session, Seiten serverseitig gerendert) |
-| Login, Registrierung (Passwort ≥ 12 Zeichen), TOTP-Einrichtung und -Abfrage | Integration getestet über Supabase-API (Login, TOTP, aal2); Klickweg im Browser durch Nutzer offen |
-| Freigaben-Seite (Stufe B/C, Payload, Begründungspflicht C), Übersicht mit Kill-Switch und Budgets, Audit-Log | Integration getestet (Daten-API + Rendering); Formular-Klick durch Nutzer offen |
-| Operator-Freischaltung `npm run db:add-operator -- --email …` | Lokal getestet (Fehlerfall) |
+| Login, Registrierung (Passwort ≥ 12 Zeichen), TOTP-Einrichtung und -Abfrage | Integration getestet + vom Nutzer im Browser bestätigt (22.10.2026) |
+| Freigaben-Seite (Stufe B/C, Payload, Begründungspflicht C), Übersicht mit Kill-Switch und Budgets, Audit-Log | Integration getestet + erste echte Freigabe durch den Nutzer (22.10.2026) |
+| Operator-Freischaltung `npm run db:add-operator -- --email …` | Integration getestet (Nutzer freigeschaltet) |
 | Schema `fabric` in Data API freigegeben; anonymer Zugriff wird abgewiesen | Integration getestet |
-| End-to-End-Test `apps/dashboard/test/auth-flow.itest.ts` (6 Tests, insgesamt 29 Integrationstests) | Integration getestet |
-| Erste echte Freigabe durch den Nutzer im Browser (Demo-Job wartet) | Offen |
+| End-to-End-Test `apps/dashboard/test/auth-flow.itest.ts` (7 Tests) | Integration getestet |
+| Erste echte Freigabe: Worker stellt ein → Nutzer gibt mit MFA frei → Worker führt aus → Audit-Log vollständig | Integration getestet (22.10.2026) |
+| Runner löst Freigaben vor der Ausführung selbst ein (Kill-Switch, Ablauf, Payload-Hash, einmalig) | Integration getestet (31 Tests) |
+| Smartphone im Heimnetz (allowedDevOrigins = eigene LAN-IP) | Implementiert – Test am Handy offen |
